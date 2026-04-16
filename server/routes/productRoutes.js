@@ -20,4 +20,21 @@ router.get('/all', async (req, res) => {
     }
 });
 
+router.delete('/:id', async (req, res) => {
+    try {
+        const { id } = req.params;
+        const deleted = await Product.destroy({
+            where: { id: id }
+        });
+
+        if (deleted) {
+            res.json({ mensaje: "Joya eliminada correctamente" });
+        } else {
+            res.status(404).json({ mensaje: "No se encontró la joya con ese ID" });
+        }
+    } catch (error) {
+        res.status(500).json({ mensaje: "Error al eliminar la joya", error });
+    }
+});
+
 module.exports = router;
