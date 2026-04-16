@@ -1,7 +1,7 @@
 import React from 'react';
 import { Edit, Trash2, Plus } from 'lucide-react';
 
-const ProductTable = ({ joyas, cargando, totalJoyas }) => {
+const ProductTable = ({ joyas, cargando, totalJoyas, onOpenModal }) => {
   if (cargando) {
     return (
       <div className="flex justify-center py-20">
@@ -13,7 +13,7 @@ const ProductTable = ({ joyas, cargando, totalJoyas }) => {
   return (
     <><div className="overflow-x-auto mb-4 flex items-center justify-end">
       <div>
-        <button className="btn btn-primary ml-4">
+        <button className="btn btn-primary ml-4" onClick={onOpenModal}>
           <Plus size={20} /> Nuevo Producto
         </button>
       </div>
