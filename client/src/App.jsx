@@ -1,9 +1,12 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
+import Navbar from './components/Navbar';
+import ProductTable from './components/ProductTable';
+import { Package } from 'lucide-react';
 
 function App() {
-  const [joyas, setJoyas] = useState([]); 
-  const [cargando, setCargando] = useState(true); 
+  const [joyas, setJoyas] = useState([]);
+  const [cargando, setCargando] = useState(true);
 
   const obtenerJoyas = async () => {
     try {
@@ -11,51 +14,25 @@ function App() {
       setJoyas(respuesta.data);
       setCargando(false);
     } catch (error) {
-      console.error("Error al traer las joyas:", error);
+      console.error("Error:", error);
       setCargando(false);
     }
   };
 
-
-  useEffect(() => {
-    obtenerJoyas();
-  }, []);
+  useEffect(() => { obtenerJoyas(); }, []);
 
   return (
-    <div style={{ padding: '40px', maxWidth: '800px', margin: '0 auto', fontFamily: 'Arial' }}>
-      <h1 className="text-4xl font-bold text-indigo-600 ">
-        ✨ Glow Inventory System
-      </h1>
+    <div className="min-h-screen bg-base-200">
+      <Navbar />
+      
+      <main className="p-8">
+        <header className="flex items-center gap-2 mb-6 text-2xl font-semibold">
+          <Package className="text-secondary" /> 
+          <h2>Gestión de Inventario</h2>
+        </header>
 
-      {cargando ? (
-        <p>Cargando inventario...</p>
-      ) : (
-        <div style={{ marginTop: '20px' }}>
-          <h2>Inventario Actual ({joyas.length})</h2>
-          <table border="1" style={{ width: '100%', borderCollapse: 'collapse', textAlign: 'left' }}>
-            <thead style={{ backgroundColor: '#f4f4f4' }}>
-              <tr>
-                <th style={{ padding: '10px' }}>SKU</th>
-                <th style={{ padding: '10px' }}>Nombre</th>
-                <th style={{ padding: '10px' }}>Categoría</th>
-                <th style={{ padding: '10px' }}>Precio</th>
-                <th style={{ padding: '10px' }}>Stock</th>
-              </tr>
-            </thead>
-            <tbody>
-              {joyas.map((joya) => (
-                <tr key={joya.id}>
-                  <td style={{ padding: '10px' }}>{joya.sku}</td>
-                  <td style={{ padding: '10px' }}>{joya.nombre}</td>
-                  <td style={{ padding: '10px' }}>{joya.categoria}</td>
-                  <td style={{ padding: '10px' }}>${joya.precioVenta}</td>
-                  <td style={{ padding: '10px' }}>{joya.stock}</td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
-        </div>
-      )}
+        <ProductTable joyas={joyas} cargando={cargando} totalJoyas={joyas.length} />
+      </main>
     </div>
   );
 }
