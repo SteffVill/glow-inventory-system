@@ -1,20 +1,19 @@
 const express = require('express');
 const db = require('./config/db');
-
 const Product = require('./models/Product'); 
-
 const app = express();
 const PORT = 5000;
+const productRoutes = require('./routes/productRoutes');
+
+app.use(express.json());
+app.use('/api/products', productRoutes); 
 
 async function startServer() {
     try {
         
         await db.authenticate();
-        console.log('✅ Conexión establecida con MySQL.');
-
-        
-        await db.sync({ alter: true });
-        
+        console.log('✅ Conexión establecida con MySQL.');        
+        await db.sync({ alter: true });        
         
         const modelosCargados = Object.keys(db.models);
         console.log('Modelos detectados por Sequelize:', modelosCargados);
