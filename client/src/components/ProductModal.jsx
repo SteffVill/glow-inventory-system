@@ -1,58 +1,89 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
-import { X, Save, Calculator } from 'lucide-react';
+import { X, Save, Calculator, AlertCircle } from 'lucide-react';
+import { rules } from '../utils/rules';
+import { validateForm } from '../utils/validator';
 
 const ProductModal = ({ isOpen, onClose, onProductAdded }) => {
   const [formData, setFormData] = useState({
-    sku: '',
-    nombre: '',
-    categoria: '',
-    precioCosto: '', 
-    precioVenta: '',
-    stock: ''
+    sku: '', nombre: '', categoria: '', precioCosto: '', precioVenta: '', stock: ''
   });
+  const [errors, setErrors] = useState({});
+  const [serverError, setServerError] = useState('');
 
-  
   useEffect(() => {
     const costo = parseFloat(formData.precioCosto);
     if (!isNaN(costo) && costo > 0) {
       const sugerido = (costo * 1.30).toFixed(2);
       setFormData(prev => ({ ...prev, precioVenta: sugerido }));
+    } else {
+      setFormData(prev => ({ ...prev, precioVenta: '' }));
     }
   }, [formData.precioCosto]);
 
   const handleChange = (e) => {
-    setFormData({ ...formData, [e.target.name]: e.target.value });
+    const { name, value } = e.target;  
+    if (name === 'nombre') {
+        const regex = /^[a-zA-ZñÑáéíóúÁÉÍÓÚ\s]*$/;
+        if (!regex.test(value)) return; 
+    }
+    if (name === 'precioCosto' || name === 'stock') {
+        const regex = name === 'precioCosto' ? /^[0-9.]*$/ : /^[0-9]*$/;
+        if (!regex.test(value)) return;
+    }
+    if (name === 'precioCosto') {
+        const regex = /^[0-9.]*$/; 
+        if (!regex.test(value)) return;
+    }
+
+    if (name === 'stock') {
+        const regex = /^[0-9]*$/; 
+        if (!regex.test(value)) return;
+    }
+    setFormData({ ...formData, [name]: value });
+    if (errors[name]) setErrors({ ...errors, [name]: '' });
+    setServerError('');
   };
 
- const handleSubmit = async (e) => {
-  e.preventDefault();
-  
-  // Aseguramos que los tipos de datos sean los que Sequelize espera
-  const payload = {
-    sku: formData.sku,
-    nombre: formData.nombre,
-    categoria: formData.categoria,
-    precioCosto: parseFloat(formData.precioCosto),
-    precioVenta: parseFloat(formData.precioVenta),
-    stock: parseInt(formData.stock)
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+
+    const jewelrySchema = {
+      nombre: [rules.required, rules.onlyLetters],
+      sku: [rules.required, rules.minLength(3)],
+      categoria: [rules.required],
+      precioCosto: [rules.required, rules.isNumber, rules.positive],
+      stock: [rules.required, rules.isNumber]
+    };
+
+    const formErrors = validateForm(formData, jewelrySchema);
+
+    if (Object.keys(formErrors).length > 0) {
+      setErrors(formErrors);
+      return;
+    }
+
+    try {
+      const payload = {
+        ...formData,
+        precioCosto: parseFloat(formData.precioCosto),
+        precioVenta: parseFloat(formData.precioVenta),
+        stock: parseInt(formData.stock)
+      };
+
+      await axios.post('http://localhost:5000/api/products/create', payload);
+      onProductAdded();
+      onClose();
+      setFormData({ sku: '', nombre: '', categoria: '', precioCosto: '', precioVenta: '', stock: '' });
+    } catch (error) {
+      if (error.response?.status === 400) {
+        setServerError("El SKU ya existe en el sistema.");
+      } else {
+        setServerError("Error de comunicación con el servidor.");
+      }
+    }
   };
 
-  try {
-    // URL absoluta sin espacios ni slashes extras
-    const url = 'http://localhost:5000/api/products/create';
-    const res = await axios.post(url, payload);
-    
-    console.log("¡Éxito total!", res.data);
-    onProductAdded();
-    onClose();
-    // Limpiamos para la próxima joya
-    setFormData({ sku: '', nombre: '', categoria: '', precioCosto: '', precioVenta: '', stock: '' });
-  } catch (error) {
-    // Si vuelve a fallar, esto nos dirá la verdad
-    console.error("Error al guardar:", error.response?.data || error.message);
-  }
-};
   if (!isOpen) return null;
 
   return (
@@ -61,49 +92,61 @@ const ProductModal = ({ isOpen, onClose, onProductAdded }) => {
         <button onClick={onClose} className="btn btn-sm btn-circle absolute right-2 top-2">✕</button>
         
         <h3 className="text-xl font-bold mb-6 flex items-center gap-2">
-          <Calculator className="text-primary" /> Registrar Nueva Joya
+           Nuevo producto
         </h3>
 
+        {serverError && (
+          <div className="alert alert-error mb-4 shadow-sm py-2">
+            <AlertCircle size={18} /> <span className="text-sm font-bold">{serverError}</span>
+          </div>
+        )}
+
         <form onSubmit={handleSubmit} className="grid grid-cols-2 gap-4">
-          
-          <div className="form-control col-span-2">
-            <label className="label font-bold text-xs uppercase text-gray-500">Nombre de la Pieza</label>
-            <input name="nombre" value={formData.nombre} onChange={handleChange} type="text" className="input input-bordered w-full" required />
+          <div className="form-control">
+            <label className="label font-bold text-xs uppercase text-gray-500 mb-2">Nombre del producto</label>
+            <input name="nombre" value={formData.nombre} onChange={handleChange} type="text" className={`input input-bordered w-full ${errors.nombre ? 'input-error' : ''}`} required />
+            {errors.nombre && <span className="text-error text-[10px] mt-1 font-bold italic">{errors.nombre}</span>}
           </div>
 
-         
           <div className="form-control">
-            <label className="label font-bold text-xs uppercase text-gray-500">SKU</label>
-            <input name="sku" value={formData.sku} onChange={handleChange} type="text" className="input input-bordered" required />
+            <label className="label font-bold text-xs uppercase text-gray-500 mb-2">SKU</label>
+            <input name="sku" value={formData.sku} onChange={handleChange} type="text" className={`input input-bordered ${errors.sku ? 'input-error' : ''}`} required />
+            {errors.sku && <span className="text-error text-[10px] mt-1 font-bold italic">{errors.sku}</span>}
           </div>
+
           <div className="form-control">
-            <label className="label font-bold text-xs uppercase text-gray-500">Categoría</label>
+            <label className="label font-bold text-xs uppercase text-gray-500 mb-2">Categoría</label>
             <select name="categoria" value={formData.categoria} onChange={handleChange} className="select select-bordered" required>
               <option value="">Seleccione...</option>
               <option value="Anillos">Anillos</option>
               <option value="Collares">Collares</option>
               <option value="Zarcillos">Zarcillos</option>
+              <option value="Pulseras">Pulseras</option>
             </select>
           </div>
 
-          
-          <div className="form-control bg-base-200 p-3 rounded-lg border-2 border-dashed border-primary/20">
-            <label className="label font-bold text-xs uppercase text-primary">Precio Costo ($)</label>
-            <input name="precioCosto" value={formData.precioCosto} onChange={handleChange} type="number" step="0.01" className="input input-bordered font-bold" required />
+          <div className="form-control">
+            <label className="label font-bold text-xs uppercase text-gray-500 mb-2">Precio Costo ($)</label>
+            <input name="precioCosto" inputMode="numeric" value={formData.precioCosto} onChange={handleChange} type="text" step="0.01" className={`input input-bordered font-bold ${errors.precioCosto ? 'input-error' : ''}`} required />
+            {errors.precioCosto && <span className="text-error text-[10px] mt-1 font-bold italic">{errors.precioCosto}</span>}
           </div>
-          <div className="form-control bg-primary/5 p-3 rounded-lg border-2 border-primary/30">
-            <label className="label font-bold text-xs uppercase text-secondary">Venta Sugerida (+30%)</label>
-            <input name="precioVenta" value={formData.precioVenta} onChange={handleChange} type="number" step="0.01" className="input input-bordered border-primary text-primary font-bold" required />
+
+           <div className="form-control ">
+            <label className="label font-bold text-xs uppercase text-gray-500 mb-2">Venta Sugerida (+30%) </label>
+            <input name="precioVenta" inputMode="numeric" value={formData.precioVenta} readOnly type="text" step="0.01" className="input input-bordered bg-gray-100 text-primary font-bold text-center text-xl" />
+          </div>
+
+          <div className="form-control">
+            <label className="label font-bold text-xs uppercase text-gray-500 mb-2">Stock Inicial</label>
+            <input name="stock" inputMode="numeric" value={formData.stock} onChange={handleChange} type="text" className={`input input-bordered ${errors.stock ? 'input-error' : ''}`} required />
+            {errors.stock && <span className="text-error text-[10px] mt-1 font-bold italic">{errors.stock}</span>}
           </div>
 
          
-          <div className="form-control">
-            <label className="label font-bold text-xs uppercase text-gray-500">Stock Inicial</label>
-            <input name="stock" value={formData.stock} onChange={handleChange} type="number" className="input input-bordered" required />
-          </div>
-          <div className="flex items-end">
-            <button type="submit" className="btn btn-primary w-full shadow-lg">
-              <Save size={18} className="mr-2" /> Guardar Joya
+
+          <div className="col-span-2 flex justify-center mt-4">
+            <button type="submit" className="btn btn-primary btn-wide shadow-lg">
+              <Save size={18} className="mr-2" /> Guardar Producto
             </button>
           </div>
         </form>
