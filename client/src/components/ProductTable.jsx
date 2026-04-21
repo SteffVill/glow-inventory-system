@@ -23,6 +23,7 @@ const ProductTable = ({ joyas, onOpenModal, onEditProduct, cargando, totalJoyas 
             <tr className="text-base text-secondary">
               <th>Producto</th>
               <th>Categoría</th>
+              <th>Costo</th>
               <th>Precio</th>
               <th>Stock</th>
               <th className="text-center">Acciones</th>
@@ -45,6 +46,7 @@ const ProductTable = ({ joyas, onOpenModal, onEditProduct, cargando, totalJoyas 
                   </div>
                 </td>
                 <td><span className="badge badge-ghost">{joya.categoria}</span></td>
+                <td className="font-medium text-success">${joya.precioCosto}</td>
                 <td className="font-medium text-success">${joya.precioVenta}</td>
                 <td>
                   <div className={`badge ${joya.stock < 5 ? 'badge-error' : 'badge-ghost'}`}>
