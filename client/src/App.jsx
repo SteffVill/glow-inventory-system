@@ -2,14 +2,25 @@ import React, { useState, useEffect } from 'react';
 import Navbar from './components/Navbar';
 import ProductTable from './components/ProductTable';
 import ProductModal from './components/ProductModal';
+import SearchBar from './components/SearchBar';
 import { Package } from 'lucide-react';
 import { productService } from '../../server/services/productServices';
 
 function App() {
   const [joyas, setJoyas] = useState([]);
   const [cargando, setCargando] = useState(true);
+  const [filtro, setFiltro] = useState('');  
   const [isModalOpen, setIsModalOpen] = useState(false); 
   const [joyaSeleccionada, setJoyaSeleccionada] = useState(null);
+
+  const joyasFiltradas = joyas.filter(joya => {
+    const searchLower = filtro.toLowerCase();
+    return (
+      joya.nombre?.toLowerCase().includes(searchLower) ||
+      joya.sku?.toLowerCase().includes(searchLower) ||
+      joya.categoria?.toLowerCase().includes(searchLower)
+    );
+  });
 
   const obtenerJoyas = async () => {
     try {
@@ -55,11 +66,14 @@ function App() {
           <Package className="text-secondary" /> 
           <h2>Gestión de Inventario</h2>
         </header>
-
+        <SearchBar 
+            filterText={filtro} 
+            onFilterChange={setFiltro} 
+        />
         <ProductTable 
-          joyas={joyas} 
+          joyas={joyasFiltradas}
           cargando={cargando} 
-          totalJoyas={joyas.length} 
+          totalJoyas={joyasFiltradas.length}
           onOpenModal={abrirParaCrear}
           onEditProduct={abrirParaEditar}
           onDeleteProduct={eliminarJoya}
