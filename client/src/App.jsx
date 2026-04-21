@@ -27,7 +27,7 @@ function App() {
   const obtenerJoyas = async () => {
     try {
       setCargando(true);
-      const respuesta = await productService.getAll();
+      const respuesta = await axios.get(API_URL);
       setJoyas(respuesta.data);
       setCargando(false);
     } catch (error) {
@@ -51,7 +51,7 @@ function App() {
   const eliminarJoya = async (id) => {
     if (window.confirm("¿Estás segura de eliminar esta pieza del inventario?")) {
       try {
-        await productService.delete(id);
+        await axios.delete(`${API_URL}/${id}`);
         obtenerJoyas(); 
       } catch (error) {
         console.error("Error al eliminar:", error);

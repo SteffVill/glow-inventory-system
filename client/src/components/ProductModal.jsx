@@ -4,6 +4,8 @@ import { X, Save, Calculator, AlertCircle } from 'lucide-react';
 import { rules } from '../utils/rules';
 import { validateForm } from '../utils/validator';
 
+const URL_API = import.meta.env.VITE_API_URL || 'http://localhost:5000/api/products';
+
 const ProductModal = ({ isOpen, onClose, onProductAdded, productToEdit }) => {
   const [formData, setFormData] = useState({
     sku: '', nombre: '', categoria: '', precioCosto: '', precioVenta: '', stock: ''
@@ -13,10 +15,8 @@ const ProductModal = ({ isOpen, onClose, onProductAdded, productToEdit }) => {
 
   useEffect(() => {
     if (productToEdit) {
-      
       setFormData(productToEdit);
     } else {
-     
       setFormData({ sku: '', nombre: '', categoria: '', precioCosto: '', precioVenta: '', stock: '' });
     }
   }, [productToEdit, isOpen]);
@@ -39,15 +39,6 @@ const ProductModal = ({ isOpen, onClose, onProductAdded, productToEdit }) => {
     }
     if (name === 'precioCosto' || name === 'stock') {
         const regex = name === 'precioCosto' ? /^[0-9.]*$/ : /^[0-9]*$/;
-        if (!regex.test(value)) return;
-    }
-    if (name === 'precioCosto') {
-        const regex = /^[0-9.]*$/; 
-        if (!regex.test(value)) return;
-    }
-
-    if (name === 'stock') {
-        const regex = /^[0-9]*$/; 
         if (!regex.test(value)) return;
     }
     setFormData({ ...formData, [name]: value });
@@ -80,19 +71,24 @@ const ProductModal = ({ isOpen, onClose, onProductAdded, productToEdit }) => {
         precioVenta: parseFloat(formData.precioVenta),
         stock: parseInt(formData.stock)
       };
-            if (productToEdit && productToEdit.id) {
-                await axios.put(`http://localhost:5000/api/products/${productToEdit.id}`, payload);
-            } else {
-                await axios.post('http://localhost:5000/api/products/create', payload);
-            }
-            onProductAdded();
-            onClose();
-            setFormData({ sku: '', nombre: '', categoria: '', precioCosto: '', precioVenta: '', stock: '' });
-    } catch (error) {
-      if (error.response?.status === 400) {
-        setServerError("Error en los datos o el SKU ya existe. Revisa tu información.");
+
+      if (productToEdit && productToEdit.id) {
+          // Para editar: URL/id
+          await axios.put(`${URL_API}/${productToEdit.id}`, payload);
       } else {
-        setServerError("Error de comunicación con el servidor.");
+          // Para crear: URL/create (Asegúrate que tu backend use /create o solo la raíz)
+          await axios.post(`${URL_API}/create`, payload);
+      }
+      
+      onProductAdded();
+      onClose();
+      setFormData({ sku: '', nombre: '', categoria: '', precioCosto: '', precioVenta: '', stock: '' });
+    } catch (error) {
+      console.error("Error detallado:", error);
+      if (error.response?.status === 400) {
+        setServerError("Error en los datos o el SKU ya existe.");
+      } else {
+        setServerError("Error de comunicación: " + (error.message || "Servidor no responde"));
       }
     }
   };
@@ -153,13 +149,11 @@ const ProductModal = ({ isOpen, onClose, onProductAdded, productToEdit }) => {
             <label className="label font-bold text-xs uppercase text-gray-500 mb-2">Stock Inicial</label>
             <input name="stock" inputMode="numeric" value={formData.stock} onChange={handleChange} type="text" className={`input input-bordered ${errors.stock ? 'input-error' : ''}`} required />
             {errors.stock && <span className="text-error text-[10px] mt-1 font-bold italic">{errors.stock}</span>}
-          </div>
-
-         
+          </div>         
 
           <div className="col-span-2 flex justify-center mt-4">
             <button type="submit" className="btn btn-primary btn-wide shadow-lg">
-               {productToEdit ? 'Actualizar Producto' : 'Nuevo Producto'}
+               {productToEdit ? 'Actualizar Producto' : 'Guardar en Inventario'}
             </button>
           </div>
         </form>
