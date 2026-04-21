@@ -1,16 +1,30 @@
 import React, { useState, useEffect } from 'react';
-import axios from 'axios';
 import Navbar from './components/Navbar';
 import ProductTable from './components/ProductTable';
 import ProductModal from './components/ProductModal';
 import { Package } from 'lucide-react';
+import { productService } from '../../server/services/productServices';
 
 function App() {
   const [joyas, setJoyas] = useState([]);
   const [cargando, setCargando] = useState(true);
   const [isModalOpen, setIsModalOpen] = useState(false); 
-
   const [joyaSeleccionada, setJoyaSeleccionada] = useState(null);
+
+  const obtenerJoyas = async () => {
+    try {
+      setCargando(true);
+      const respuesta = await productService.getAll();
+      setJoyas(respuesta.data);
+      setCargando(false);
+    } catch (error) {
+      console.error("Error al cargar:", error);
+      setCargando(false);
+    }
+  };
+
+  useEffect(() => { obtenerJoyas(); }, []);
+
   const abrirParaCrear = () => {
     setJoyaSeleccionada(null);
     setIsModalOpen(true);
@@ -21,20 +35,19 @@ function App() {
     setIsModalOpen(true);
   };
 
-  const obtenerJoyas = async () => {
-    try {
-      const respuesta = await axios.get('http://localhost:5000/api/products/all');
-      setJoyas(respuesta.data);
-      setCargando(false);
-    } catch (error) {
-      console.error("Error:", error);
-      setCargando(false);
+  const eliminarJoya = async (id) => {
+    if (window.confirm("¿Estás segura de eliminar esta pieza del inventario?")) {
+      try {
+        await productService.delete(id);
+        obtenerJoyas(); 
+      } catch (error) {
+        console.error("Error al eliminar:", error);
+        alert("No se pudo eliminar el producto.");
+      }
     }
   };
 
-  useEffect(() => { obtenerJoyas(); }, []);
-
- return (
+  return (
     <div className="min-h-screen bg-base-200">
       <Navbar />      
       <main className="p-8">
@@ -42,19 +55,22 @@ function App() {
           <Package className="text-secondary" /> 
           <h2>Gestión de Inventario</h2>
         </header>
+
         <ProductTable 
           joyas={joyas} 
           cargando={cargando} 
           totalJoyas={joyas.length} 
-          onOpenModal={abrirParaCrear}  // <--- CORREGIDO: Usamos la función que limpia
+          onOpenModal={abrirParaCrear}
           onEditProduct={abrirParaEditar}
-          />
+          onDeleteProduct={eliminarJoya}
+        />
       </main>
+
       <ProductModal 
         isOpen={isModalOpen} 
         onClose={() => {
           setIsModalOpen(false);
-          setJoyaSeleccionada(null); // <--- CORREGIDO: Limpiamos al cerrar
+          setJoyaSeleccionada(null);
         }} 
         onProductAdded={obtenerJoyas}
         productToEdit={joyaSeleccionada} 
