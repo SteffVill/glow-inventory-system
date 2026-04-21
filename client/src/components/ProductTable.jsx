@@ -35,8 +35,10 @@ const ProductTable = ({ joyas, onOpenModal, onEditProduct, cargando, totalJoyas 
                 <td>
                   <div className="flex items-center gap-3">
                     <div className="avatar placeholder">
-                      <div className="bg-neutral text-neutral-content rounded-full w-10">
-                        <span>{joya.nombre.charAt(0)}</span>
+                      <div className="bg-neutral text-neutral-content rounded-full w-10 flex justify-center items-center">
+                        <div>
+                          <p className="uppercase font-bold text-center">{joya.nombre.charAt(0)}</p>
+                        </div>
                       </div>
                     </div>
                     <div>
