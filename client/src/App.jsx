@@ -4,7 +4,9 @@ import ProductTable from './components/ProductTable';
 import ProductModal from './components/ProductModal';
 import SearchBar from './components/SearchBar';
 import { Package } from 'lucide-react';
-import { productService } from '../../server/services/productServices';
+import axios from 'axios';
+
+const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000/api/products';
 
 function App() {
   const [joyas, setJoyas] = useState([]);
