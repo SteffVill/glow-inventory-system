@@ -4,12 +4,22 @@ import { X, Save, Calculator, AlertCircle } from 'lucide-react';
 import { rules } from '../utils/rules';
 import { validateForm } from '../utils/validator';
 
-const ProductModal = ({ isOpen, onClose, onProductAdded }) => {
+const ProductModal = ({ isOpen, onClose, onProductAdded, productToEdit }) => {
   const [formData, setFormData] = useState({
     sku: '', nombre: '', categoria: '', precioCosto: '', precioVenta: '', stock: ''
   });
   const [errors, setErrors] = useState({});
   const [serverError, setServerError] = useState('');
+
+  useEffect(() => {
+    if (productToEdit) {
+      
+      setFormData(productToEdit);
+    } else {
+     
+      setFormData({ sku: '', nombre: '', categoria: '', precioCosto: '', precioVenta: '', stock: '' });
+    }
+  }, [productToEdit, isOpen]);
 
   useEffect(() => {
     const costo = parseFloat(formData.precioCosto);
@@ -70,14 +80,17 @@ const ProductModal = ({ isOpen, onClose, onProductAdded }) => {
         precioVenta: parseFloat(formData.precioVenta),
         stock: parseInt(formData.stock)
       };
-
-      await axios.post('http://localhost:5000/api/products/create', payload);
-      onProductAdded();
-      onClose();
-      setFormData({ sku: '', nombre: '', categoria: '', precioCosto: '', precioVenta: '', stock: '' });
+            if (productToEdit && productToEdit.id) {
+                await axios.put(`http://localhost:5000/api/products/${productToEdit.id}`, payload);
+            } else {
+                await axios.post('http://localhost:5000/api/products/create', payload);
+            }
+            onProductAdded();
+            onClose();
+            setFormData({ sku: '', nombre: '', categoria: '', precioCosto: '', precioVenta: '', stock: '' });
     } catch (error) {
       if (error.response?.status === 400) {
-        setServerError("El SKU ya existe en el sistema.");
+        setServerError("Error en los datos o el SKU ya existe. Revisa tu información.");
       } else {
         setServerError("Error de comunicación con el servidor.");
       }
@@ -91,8 +104,8 @@ const ProductModal = ({ isOpen, onClose, onProductAdded }) => {
       <div className="modal-box max-w-2xl border-t-4 border-primary">
         <button onClick={onClose} className="btn btn-sm btn-circle absolute right-2 top-2">✕</button>
         
-        <h3 className="text-xl font-bold mb-6 flex items-center gap-2">
-           Nuevo producto
+        <h3 className="text-xl font-bold text-primary mb-6 flex items-center gap-2">
+           {productToEdit ? "Editar producto" : "Nuevo producto"}
         </h3>
 
         {serverError && (
@@ -133,7 +146,7 @@ const ProductModal = ({ isOpen, onClose, onProductAdded }) => {
 
            <div className="form-control ">
             <label className="label font-bold text-xs uppercase text-gray-500 mb-2">Venta Sugerida (+30%) </label>
-            <input name="precioVenta" inputMode="numeric" value={formData.precioVenta} readOnly type="text" step="0.01" className="input input-bordered bg-gray-100 text-primary font-bold text-center text-xl" />
+            <input name="precioVenta" inputMode="numeric" value={formData.precioVenta} readOnly type="text" step="0.01" className="input input-bordered bg-gray-100 text-primary font-bold text-xl" />
           </div>
 
           <div className="form-control">
@@ -146,7 +159,7 @@ const ProductModal = ({ isOpen, onClose, onProductAdded }) => {
 
           <div className="col-span-2 flex justify-center mt-4">
             <button type="submit" className="btn btn-primary btn-wide shadow-lg">
-              <Save size={18} className="mr-2" /> Guardar Producto
+               {productToEdit ? 'Actualizar Producto' : 'Nuevo Producto'}
             </button>
           </div>
         </form>
