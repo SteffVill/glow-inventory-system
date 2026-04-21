@@ -13,9 +13,11 @@ Este es un sistema diseñado para administrar el inventario de una joyería, per
 ### 1. Backend (Servidor Node.js + Express)
 El servidor maneja la lógica de negocio y la conexión con la base de datos.
 - **Carpeta:** `server/`
-- **Instalación:** ```bash
+- **Instalación:**
+  ```bash
   cd server
   npm install
+  ```
 
 ### 2. Configuración: Crea un archivo .env en la carpeta server/ con los siguientes datos:
     PORT=5000
