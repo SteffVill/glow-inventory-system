@@ -1,16 +1,38 @@
-# React + Vite
+# 💎 Sistema de Gestión de Inventario - Joyería
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+Este es un sistema diseñado para administrar el inventario de una joyería, permitiendo el control total de piezas, búsqueda avanzada y una interfaz optimizada para el usuario.
 
-Currently, two official plugins are available:
+## 🚀 Funcionalidades Principales
+- **Búsqueda en Tiempo Real:** Filtro inteligente por SKU, Nombre y Categoría desde el buscador principal.
+- **Gestión CRUD:** Creación, edición, visualización y eliminación de joyas.
+- **Identificación Visual:** Sistema de avatares con iniciales dinámicas para cada producto.
+- **Interfaz Premium:** Construida con Tailwind CSS y DaisyUI para un look moderno y responsivo.
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Oxc](https://oxc.rs)
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/)
+## 🛠️ Requisitos e Instalación
 
-## React Compiler
+### 1. Backend (Servidor Node.js + Express)
+El servidor maneja la lógica de negocio y la conexión con la base de datos.
+- **Carpeta:** `server/`
+- **Instalación:** ```bash
+  cd server
+  npm install
 
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
+### 2. Configuración: Crea un archivo .env en la carpeta server/ con los siguientes datos:
+    PORT=5000
+    DB_HOST=tu_servidor_db
+    DB_USER=tu_usuario
+    DB_PASSWORD=tu_password
+    DB_NAME=nombre_de_tu_bd
+### 4. Ejecución: npm start
 
-## Expanding the ESLint configuration
+### 5. Frontend (React + Vite) 
+- Entrar a la carpeta: `cd client`
+- Instalar librerías: `npm install`
+- Iniciar aplicación: `npm run dev`
 
-If you are developing a production application, we recommend using TypeScript with type-aware lint rules enabled. Check out the [TS template](https://github.com/vitejs/vite/tree/main/packages/create-vite/template-react-ts) for information on how to integrate TypeScript and [`typescript-eslint`](https://typescript-eslint.io) in your project.
+## ☁️ Despliegue en Producción
+- **Frontend:** Alojado en Vercel.
+- **Backend:** Alojado en Render / Railway.
+- **Variable de Entorno:** Se requiere configurar `VITE_API_URL` en el proveedor de hosting.
+
+👤 Autora- Andreina Villalba Ingeniera en Informática Especialista en Desarrollo Web y UI/UX.
