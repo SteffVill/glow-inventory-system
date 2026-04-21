@@ -1,6 +1,6 @@
 const { Sequelize } = require('sequelize');
 require('dotenv').config();
-
+console.log("Comprobando Host:", process.env.DB_HOST);
 const db = new Sequelize(
     process.env.DB_NAME, 
     process.env.DB_USER, 
