@@ -1,7 +1,7 @@
 import React from 'react';
 import { Edit, Trash2, Plus } from 'lucide-react';
 
-const ProductTable = ({ joyas, onOpenModal, onEditProduct, cargando, totalJoyas }) => {
+const ProductTable = ({ joyas, onOpenModal, onEditProduct, onDeleteProduct, cargando, totalJoyas }) => {
   if (cargando) {
     return (
       <div className="flex justify-center py-20">
@@ -56,20 +56,25 @@ const ProductTable = ({ joyas, onOpenModal, onEditProduct, cargando, totalJoyas 
                   </div>
                 </td>
                 <td className="flex justify-center gap-2">
-                  <button onClick={() => onEditProduct(joya)} className="btn btn-square btn-sm btn-soft btn-info"><Edit size={18} /></button>
-                  <button className="btn btn-square btn-sm btn-soft btn-error"><Trash2 size={18} /></button>
+                  <button 
+                    onClick={() => onEditProduct(joya)} 
+                    className="btn btn-square btn-sm btn-soft btn-info">
+                      <Edit size={18} />
+                  </button>
+                  <button 
+                    className="btn btn-square btn-sm btn-soft btn-error" 
+                    onClick={() => onDeleteProduct(joya.id)}>
+                      <Trash2 size={18} />
+                  </button>
                 </td>
               </tr>
             ))}
           </tbody>
           <tfoot>
             <tr>
-              <th colSpan="4" className="text-center">
-                Total de Productos
-              </th>
-              <th className="text-center">
-                {totalJoyas}
-              </th>
+              <th colSpan="6" className="font-bold">
+                Total: {totalJoyas} Productos
+              </th>             
             </tr>
           </tfoot>
         </table>
