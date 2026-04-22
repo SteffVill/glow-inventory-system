@@ -27,7 +27,6 @@ function App() {
   const obtenerJoyas = async () => {
     try {
         setCargando(true);
-        // GET directo a /api/products (sin /all)
         const respuesta = await axios.get(API_URL); 
         setJoyas(respuesta.data);
         setCargando(false);
@@ -52,6 +51,7 @@ function App() {
   const eliminarJoya = async (id) => {
     if (window.confirm("¿Estás segura de eliminar esta pieza del inventario?")) {
       try {
+        // Usamos backticks para concatenar el ID a la ruta base
         await axios.delete(`${API_URL}/${id}`);
         obtenerJoyas(); 
       } catch (error) {
