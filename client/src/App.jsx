@@ -26,13 +26,14 @@ function App() {
 
   const obtenerJoyas = async () => {
     try {
-      setCargando(true);
-      const respuesta = await axios.get(API_URL);
-      setJoyas(respuesta.data);
-      setCargando(false);
+        setCargando(true);
+        // GET directo a /api/products (sin /all)
+        const respuesta = await axios.get(API_URL); 
+        setJoyas(respuesta.data);
+        setCargando(false);
     } catch (error) {
-      console.error("Error al cargar:", error);
-      setCargando(false);
+        console.error("Error al cargar:", error);
+        setCargando(false);
     }
   };
 

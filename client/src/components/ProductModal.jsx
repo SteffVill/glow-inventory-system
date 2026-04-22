@@ -72,12 +72,10 @@ const ProductModal = ({ isOpen, onClose, onProductAdded, productToEdit }) => {
         stock: parseInt(formData.stock)
       };
 
-      if (productToEdit && productToEdit.id) {
-          // Para editar: URL/id
+      if (productToEdit && productToEdit.id) {          
           await axios.put(`${URL_API}/${productToEdit.id}`, payload);
-      } else {
-          // Para crear: URL/create (Asegúrate que tu backend use /create o solo la raíz)
-          await axios.post(`${URL_API}/create`, payload);
+      } else {          
+          await axios.post(URL_API, payload);
       }
       
       onProductAdded();
@@ -88,7 +86,7 @@ const ProductModal = ({ isOpen, onClose, onProductAdded, productToEdit }) => {
       if (error.response?.status === 400) {
         setServerError("Error en los datos o el SKU ya existe.");
       } else {
-        setServerError("Error de comunicación: " + (error.message || "Servidor no responde"));
+        setServerError("Error de comunicación con el servidor.");
       }
     }
   };
