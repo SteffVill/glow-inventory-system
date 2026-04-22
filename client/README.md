@@ -8,31 +8,25 @@ Este es un sistema diseñado para administrar el inventario de una joyería, per
 - **Identificación Visual:** Sistema de avatares con iniciales dinámicas para cada producto.
 - **Interfaz Premium:** Construida con Tailwind CSS y DaisyUI para un look moderno y responsivo.
 
-## 🛠️ Requisitos e Instalación
+# 💎 Glow Inventory System
 
-### 1. Backend (Servidor Node.js + Express)
-El servidor maneja la lógica de negocio y la conexión con la base de datos.
-- **Carpeta:** `server/`
-- **Instalación:** ```bash
-  cd server
-  npm install
+Sistema de inventario para joyería (Fullstack).
 
-### 2. Configuración: Crea un archivo .env en la carpeta server/ con los siguientes datos:
-    PORT=5000
-    DB_HOST=tu_servidor_db
-    DB_USER=tu_usuario
-    DB_PASSWORD=tu_password
-    DB_NAME=nombre_de_tu_bd
-### 4. Ejecución: npm start
+## 🚀 Despliegue
+- **Frontend:** Vercel
+- **Backend:** Render / Railway
 
-### 5. Frontend (React + Vite) 
-- Entrar a la carpeta: `cd client`
-- Instalar librerías: `npm install`
-- Iniciar aplicación: `npm run dev`
+## 💻 Configuración Local
+1. **Server:** - `npm install`
+   - Configura tu `.env` con las credenciales de tu MySQL local.
+   - `npm run dev` (Corre en puerto 5000 por defecto).
+2. **Client:** - `npm install`
+   - `npm run dev` (Se conectará automáticamente a localhost:5000).
 
-## ☁️ Despliegue en Producción
-- **Frontend:** Alojado en Vercel.
-- **Backend:** Alojado en Render / Railway.
-- **Variable de Entorno:** Se requiere configurar `VITE_API_URL` en el proveedor de hosting.
+## 📍 API REST
+- `GET /api/products` - Listar todo.
+- `POST /api/products` - Crear producto.
+- `PUT /api/products/:id` - Editar.
+- `DELETE /api/products/:id` - Eliminar.
 
 👤 Autora- Andreina Villalba Ingeniera en Informática Especialista en Desarrollo Web y UI/UX.
