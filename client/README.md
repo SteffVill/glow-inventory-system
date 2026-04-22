@@ -23,7 +23,21 @@ Sistema de inventario para joyería (Fullstack).
 2. **Client:** - `npm install`
    - `npm run dev` (Se conectará automáticamente a localhost:5000).
 
-## 📍 API REST
+## Configurar el Servidor (Backend)
+
+    Entra a la carpeta: cd server
+    Instala las dependencias: npm install
+    Crea un archivo .env basado en el .env.example con tus credenciales de MySQL local.
+    Inicia el servidor: npm run dev
+
+## Configurar el Cliente (Frontend)
+
+    Entra a la carpeta: cd client
+    Instala las dependencias: npm install
+    Inicia la app: npm run dev
+    Nota: El sistema usará automáticamente localhost:5000 para el backend.
+
+## 📍 API REST Endpoints
 - `GET /api/products` - Listar todo.
 - `POST /api/products` - Crear producto.
 - `PUT /api/products/:id` - Editar.
